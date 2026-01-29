@@ -115,20 +115,28 @@
         const playerBar = document.getElementById('playerBar');
         const statusText = document.getElementById('currentStation');
 
-        function playRadio(url, name, element) {
-            // ไฮไลท์การเลือก
-            document.querySelectorAll('.station-card').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+function playRadio(url, name, element) {
+    // 1. จัดการเรื่อง UI
+    document.querySelectorAll('.station-card').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    playerBar.style.display = 'block';
+    statusText.innerText = "กำลังเล่น: " + name;
 
-            // แสดงตัวเล่น
-            playerBar.style.display = 'block';
-            statusText.innerText = "กำลังเล่น: " + name;
-
-            // โหลดและเล่น
-            audio.src = url;
-            audio.load();
-            audio.play();
-        }
+    // 2. จัดการเรื่องเสียง (บังคับให้เปลี่ยน Source และเล่นใหม่)
+    audio.pause();
+    audio.src = url;
+    audio.load(); // สำคัญมากเพื่อให้ Browser เตรียมข้อมูลใหม่
+    
+    // 3. แก้ปัญหาการบล็อก Autoplay
+    var playPromise = audio.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(error => {
+            console.log("ระบบบล็อกการเล่นอัตโนมัติ: ", error);
+            // ถ้าเล่นไม่ได้ ให้ผู้ใช้กดปุ่ม Play เองในแถบควบคุม
+        });
+    }
+}
     </script>
 </body>
 </html>
+
